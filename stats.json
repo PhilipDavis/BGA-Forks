@@ -1,0 +1,66 @@
+{
+    "table": {
+        "rounds": {
+            "id": 10,
+            "name": "Number of rounds",
+            "type": "int"
+        }
+    },
+    "player": {
+        "points_grey": {
+            "id": 10,
+            "name": "Points from grey",
+            "type": "int"
+        },
+        "points_blue": {
+            "id": 11,
+            "name": "Points from blue",
+            "type": "int"
+        },
+        "points_yellow": {
+            "id": 12,
+            "name": "Points from yellow",
+            "type": "int"
+        },
+        "points_green": {
+            "id": 13,
+            "name": "Points from green",
+            "type": "int"
+        },
+        "points_red": {
+            "id": 14,
+            "name": "Points from red",
+            "type": "int"
+        },
+        "points_lows_23": {
+            "id": 15,
+            "name": "Points from low cards (3 - 4)",
+            "type": "int"
+        },
+        "points_mids_23": {
+            "id": 16,
+            "name": "Points from mid cards (5 - 7)",
+            "type": "int"
+        },
+        "points_highs_23": {
+            "id": 17,
+            "name": "Points from high cards (8 - 9)",
+            "type": "int"
+        },
+        "points_lows_456": {
+            "id": 18,
+            "name": "Points from low cards (3 - 5)",
+            "type": "int"
+        },
+        "points_mids_456": {
+            "id": 19,
+            "name": "Points from mid cards (6 - 9)",
+            "type": "int"
+        },
+        "points_highs_456": {
+            "id": 20,
+            "name": "Points from high cards (10 - 12)",
+            "type": "int"
+        }
+    }
+}

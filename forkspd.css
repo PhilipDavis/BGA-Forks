@@ -1,0 +1,550 @@
+/**
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * ForksPD implementation : © Copyright 2024, Philip Davis (mrphilipadavis AT gmail)
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+
+
+#forks_surface {
+    position: relative;
+    display: block;
+    min-height: 44em;
+    min-width: 55em;
+    max-width: 64em;
+    width: 100%;
+    float: left;
+    clear: both;
+}
+
+#forks_surface * {
+    box-sizing: border-box;
+}
+
+#forks_round-info {
+    position: absolute;
+    right: 1rem;
+    top: 18rem;
+    width: 7.3rem;
+    font-size: .8em;
+    text-align: center;
+}
+
+#forks_deck {
+    background-image: url(img/forks_cardback_high.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 7em;
+    right: 1em;
+    height: 10em;
+    width: 7.3em;
+}
+#forks_deck.forks_empty {
+    background-image: none;
+}
+
+#forks_tie-breaker {
+    background-image: url(img/forks_card-tiebreak-high.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    height: 5.5em;
+    width: 7.3em;
+    z-index: 1;
+    transition: all .2s ease-out;
+    transform-origin: top right;
+}
+@media screen and (orientation:landscape) {
+    #forks_tie-breaker:hover {
+        transform: scale(4);
+    }
+}
+
+#forks_marketing-hidden {
+    background-image: url(img/forks_cardback_high.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    left: 1em;
+    top: 1em;
+    height: 10em;
+    width: 7.3em;
+    perspective: 20em;
+    z-index: -1;
+}
+#forks_marketing-hidden.forks_empty {
+    background-image: none;
+}
+
+
+/* Marketing */
+
+#forks_marketing {
+    position: absolute;
+    left: 50%;
+    top: 5%;
+    transform: translate(-50%, 0%);
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 20em;
+    width: 36em;
+}
+.forks_marketing-lane {
+    flex: 0 0 7.3em;
+    transition: all .4s ease-out;
+}
+.forks_marketing-lane > *:not(.forks_placeholder):not(.forks_marketing-score) {
+    position: relative !important;
+    top: 8.4em;
+    margin-top: -8.4em;
+}
+.forks_marketing-lane > .forks_marketing-score {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 1.5em;
+    margin-top: -1em;
+    text-align: center;
+    font-size: 1.5em;
+}
+.forks_pref-columnSums-on .forks_marketing-lane > .forks_marketing-score {
+    opacity: .75;
+}
+.forks_pref-columnSums-off .forks_marketing-lane > .forks_marketing-score {
+    opacity: 0;
+    visibility: hidden;
+}
+.forks_marketing-lane > .forks_placeholder {
+    position: relative;
+    top: 10em;
+    left: 0.2em;
+    width: 6.9em;
+    height: 9.6em;
+    background-color: #f2e5d0;
+    overflow: hidden;
+    margin-top: -10em;
+    border-radius: .5em;
+    opacity: .3;
+}
+
+.forks_marketing-lane   > .forks_placeholder .forks_card-head {
+    background-image: url(img/forks-card-title-med.png); /* TODO: high res for big screens */
+    background-repeat: no-repeat;
+    background-size: 35em 16em;
+    position: absolute;
+    left: 1.5em;
+    top: 0;
+    width: 4.1em;
+    height: 17%;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
+#forks_marketing-grey   > .forks_placeholder .forks_card-head { background-position-x: -1.5em; }
+#forks_marketing-blue   > .forks_placeholder .forks_card-head { background-position-x: -8.5em; }
+#forks_marketing-yellow > .forks_placeholder .forks_card-head { background-position-x: -15.5em; }
+#forks_marketing-green  > .forks_placeholder .forks_card-head { background-position-x: -22.5em; }
+#forks_marketing-red    > .forks_placeholder .forks_card-head { background-position-x: -29.5em; }
+
+.forks_marketing-lane   > .forks_placeholder .forks_card-body {
+    background-image: url(img/forks-card-body-med.png); /* TODO: high res for big screens */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-y: 0;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 83.8%;
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+}
+#forks_marketing-grey   > .forks_placeholder .forks_card-body { background-position-x: 0; }
+#forks_marketing-blue   > .forks_placeholder .forks_card-body { background-position-x: -7.0em; }
+#forks_marketing-yellow > .forks_placeholder .forks_card-body { background-position-x: -13.9em; }
+#forks_marketing-green  > .forks_placeholder .forks_card-body { background-position-x: -20.8em; }
+#forks_marketing-red    > .forks_placeholder .forks_card-body { background-position-x: -27.7em; }
+
+.forks_loser-grey #forks_marketing-grey,
+.forks_loser-blue #forks_marketing-blue,
+.forks_loser-yellow #forks_marketing-yellow,
+.forks_loser-green #forks_marketing-green,
+.forks_loser-red #forks_marketing-red {
+    transform: translate(0, 3em);
+}
+
+
+/* Player hand */
+
+#forks_my-hand {
+    position: absolute;
+    bottom: 0;
+    height: 12em;
+    left: calc(50% - 3em); /* -3em because the last card extends out the right side of the element box */
+    transform: translate(-50%, 0);
+    white-space: nowrap;
+}
+
+#forks_my-hand > .forks_card {
+    position: relative;
+    top: 2em;
+    left: 5.75em;
+    margin-left: -5.75em;
+    transition: top .2s ease-out;
+    pointer-events: none;
+}
+
+/* Create gaps between the groups of colours */
+#forks_my-hand .forks_color-grey + :not(.forks_color-grey),
+#forks_my-hand .forks_color-blue + :not(.forks_color-blue),
+#forks_my-hand .forks_color-yellow + :not(.forks_color-yellow),
+#forks_my-hand .forks_color-green + :not(.forks_color-green) {
+    margin-left: -4.25em;
+}
+
+.forks_loser-grey #forks_my-hand .forks_color-grey,
+.forks_loser-blue #forks_my-hand .forks_color-blue,
+.forks_loser-yellow #forks_my-hand .forks_color-yellow,
+.forks_loser-green #forks_my-hand .forks_color-green,
+.forks_loser-red #forks_my-hand .forks_color-red {
+    top: 2em !important; /* Force losing cards to appear lower than the winners */
+}
+.forks_state-gameEnd #forks_my-hand .forks_card {
+    top: 0; /* Bring winning cards to the top (losing hands are dropped down in other rules) */
+}
+
+
+/* Merge Variant */
+
+.forks_state-discardSelection.forks_merge-variant #forks_my-hand .forks_card,
+.forks_state-client_confirmDiscard.forks_merge-variant #forks_my-hand .forks_card {
+    cursor: pointer;
+    pointer-events: all;
+}
+.forks_merge-variant #forks_my-hand > .forks_card.forks_selected {
+    top: 0em;
+}
+
+
+/* Cards dealt to the player */
+
+.forks_state-passSelection #forks_my-dealt .forks_card,
+.forks_state-client_confirmPass #forks_my-dealt .forks_card {
+    cursor: pointer;
+}
+.forks_state-passSelection #forks_my-dealt,
+.forks_state-client_confirmPass #forks_my-dealt {
+    pointer-events: all;
+}
+#forks_my-dealt {
+    pointer-events: none;
+    position: absolute;
+    width: 18em;
+    height: 11em;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, 0);
+    transform-origin: center;
+    font-size: 1.5em;
+    perspective: 36em;
+}
+#forks_my-dealt > .forks_slot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 10em;
+    width: 7.3em;
+    transition: all .2s ease-out;
+}
+#forks_my-dealt > .forks_slot:nth-child(1) {
+    transform: translate(calc(-50% - 5em), 0.5em) rotateZ(-10deg);
+    z-index: 1;
+}
+#forks_my-dealt > .forks_slot:nth-child(1):has(.forks_selected) {
+    transform: translate(calc(-50% - 5em), -2em) rotateZ(-2deg);
+}
+#forks_my-dealt > .forks_slot:nth-child(2) {
+    transform: translate(-50%, 0);
+    z-index: 2;
+}
+#forks_my-dealt > .forks_slot:nth-child(2):has(.forks_selected) {
+    transform: translate(-50%, -2em);
+}
+#forks_my-dealt > .forks_slot:nth-child(3) {
+    transform: translate(calc(-50% + 5em), 0.5em) rotateZ(10deg);
+    z-index: 3;
+}
+#forks_my-dealt > .forks_slot:nth-child(3):has(.forks_selected) {
+    transform: translate(calc(-50% + 5em), -2em) rotateZ(2deg);
+}
+
+
+/* Card received from an adjacent player */
+
+.forks_state-discardSelection #forks_my-received .forks_card,
+.forks_state-client_confirmDiscard #forks_my-received .forks_card {
+    cursor: pointer;
+}
+.forks_state-discardSelection #forks_my-received,
+.forks_state-client_confirmDiscard #forks_my-received {
+    pointer-events: all;
+}
+#forks_my-received {
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 11em;
+    top: 36%;
+    font-size: 1.5em;
+    perspective: 48em;
+}
+#forks_my-received > .forks_slot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 10em;
+    width: 7.3em;
+    transition: all .2s ease-out;
+}
+#forks_my-received > .forks_slot:nth-child(1) {
+    transform: translate(calc(-50% - 2.5em), 0.5em) rotateZ(-5deg);
+    z-index: 1;
+}
+#forks_my-received > .forks_slot:nth-child(1):has(.forks_selected) {
+    transform: translate(calc(-50% - 3em), -2em) rotateZ(-2deg);
+}
+#forks_my-received > .forks_slot:nth-child(2) {
+    transform: translate(calc(-50% + 2.5em), 0.5em) rotateZ(5deg);
+    z-index: 2;
+}
+#forks_my-received > .forks_slot:nth-child(2):has(.forks_selected) {
+    transform: translate(calc(-50% + 3em), -2em) rotateZ(2deg);
+}
+
+
+
+.forks_card:not(.forks_selected) {
+    border: dashed 0.2em rgba(226,0,0,0);
+    border-radius: 0.5em;
+}
+.forks_card.forks_selected:not(.forks_passed):not(.forks_discarded) {
+    border: dashed 0.2em rgba(226,0,0,.67);
+    border-radius: 0.5em;
+    cursor: default;
+}
+
+
+.forks_card-stack.forks_horizontal > * {
+    position: relative !important;
+    left: 5.75em;
+    margin-left: -5.75em;    
+}
+
+
+/* Cards being received by the Player */
+
+#forks_my-receiving {
+    background-image: url(img/forks_cardback_high.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    right: 1em;
+    bottom: 1em;
+    height: 10em;
+    width: 7.3em;
+    z-index: 100;
+}
+#forks_my-receiving.forks_empty {
+    background-image: none;
+}
+
+
+/* Cards being passed by the Player */
+
+#forks_my-passed {
+    background-image: url(img/forks_cardback_high.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    left: 1em;
+    bottom: 1em;
+    height: 10em;
+    width: 7.3em;
+    z-index: 100;
+}
+#forks_my-passed.forks_empty {
+    background-image: none;
+}
+
+
+/* Cards */
+
+.forks_card {
+    display: inline-block;
+    position: absolute;
+    height: 10em;
+    width: 7.3em;
+    transform-style: preserve-3d;
+    animation-fill-mode: forwards;
+}
+
+.forks_card-front {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+}
+.forks_card-front::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    content: ' ';
+    border: solid 0.075em rgba(0, 0, 0, .25);
+    box-sizing: border-box;
+    border-radius: 0.5em;
+}
+.forks_card-head {
+    background-image: url(img/forks-card-title-med.png); /* TODO: high res for big screens */
+    background-repeat: no-repeat;
+    background-size: 35em 16em;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 17%;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
+.forks_card[data-color="grey"]   .forks_card-head { background-position-x: 0; }
+.forks_card[data-color="blue"]   .forks_card-head { background-position-x: -7em; }
+.forks_card[data-color="yellow"] .forks_card-head { background-position-x: -14em; }
+.forks_card[data-color="green"]  .forks_card-head { background-position-x: -21em; }
+.forks_card[data-color="red"]    .forks_card-head { background-position-x: -28em; }
+.forks_card[data-value="12"] .forks_card-head { background-position-y: 0; }
+.forks_card[data-value="11"] .forks_card-head { background-position-y: -1.6em; }
+.forks_card[data-value="10"] .forks_card-head { background-position-y: -3.2em; }
+.forks_card[data-value="9"]  .forks_card-head { background-position-y: -4.8em; }
+.forks_card[data-value="8"]  .forks_card-head { background-position-y: -6.4em; }
+.forks_card[data-value="7"]  .forks_card-head { background-position-y: -8.0em; }
+.forks_card[data-value="6"]  .forks_card-head { background-position-y: -9.6em; }
+.forks_card[data-value="5"]  .forks_card-head { background-position-y: -11.2em; }
+.forks_card[data-value="4"]  .forks_card-head { background-position-y: -12.8em; }
+.forks_card[data-value="3"]  .forks_card-head { background-position-y: -14.4em; }
+.forks_card-body {
+    background-image: url(img/forks-card-body-med.png); /* TODO: high res for big screens */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-y: 0;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 83.8%;
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+}
+.forks_card[data-color="grey"]   .forks_card-body { background-position-x: 0; }
+.forks_card[data-color="blue"]   .forks_card-body { background-position-x: 25%; }
+.forks_card[data-color="yellow"] .forks_card-body { background-position-x: 50%; }
+.forks_card[data-color="green"]  .forks_card-body { background-position-x: 75%; }
+.forks_card[data-color="red"]    .forks_card-body { background-position-x: 100%; }
+
+.forks_card-back {
+    background-image: url(img/forks_cardback_high.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotateY(-180deg);
+    backface-visibility: hidden;
+}
+.forks_card.forks_card-face-down {
+    transform: rotateY(-180deg);
+}
+
+/* Darken losing cards */
+.forks_loser-grey .forks_card.forks_color-grey:after,
+.forks_loser-blue .forks_card.forks_color-blue:after,
+.forks_loser-yellow .forks_card.forks_color-yellow:after,
+.forks_loser-green .forks_card.forks_color-green:after,
+.forks_loser-red .forks_card.forks_color-red:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    content: ' ';
+    background-color: rgba(0,0,0,.1);
+    border-radius: 0.5em;
+}
+
+
+
+
+
+/* CSS for phones */
+@media screen and (orientation:portrait) {
+    #forks_surface {
+        min-height: 64em;
+        min-width: unset;
+        max-width: unset;
+    }
+
+    #forks_tie-breaker {
+        top: 2.35em;
+        width: 10em;
+        height: 7.3em;
+        left: 50%;
+        right: unset;
+        transform: translate(-50%, 0);
+        transform-origin: top center;
+    }
+    #forks_tie-breaker.forks_touching {
+        transform: translate(-50%, -2em) scale(4);
+    }
+    
+    #forks_round-info {
+        position: absolute;
+        left: 50%;
+        right: unset;
+        top: 10rem;
+        width: 10rem;
+        font-size: .9em;
+        transform: translate(-50%, 0);
+    }
+
+    #forks_deck {
+        top: 1em;
+        right: 8em;
+    }
+
+    #forks_marketing {
+        top: 16em;
+        width: 38em;
+    }
+
+    #forks_marketing-hidden {
+        top: 1em;
+        left: 8em;
+    }
+
+    #forks_my-received,
+    #forks_my-dealt {
+        top: 22em;
+    }
+}

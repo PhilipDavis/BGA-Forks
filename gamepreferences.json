@@ -1,0 +1,17 @@
+{
+    "300": {
+        "name": "Show Column Sums",
+        "needReload": false,
+        "values": {
+            "1": {
+                "name": "Off",
+                "cssPref": "forks_pref-columnSums-off"
+            },
+            "2": {
+                "name": "On",
+                "cssPref": "forks_pref-columnSums-on"
+            }
+        },
+        "default": 1
+    }
+}

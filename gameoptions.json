@@ -1,0 +1,16 @@
+{
+    "100": {
+        "name": "Rule Set",
+        "values": {
+            "1": {
+                "name": "Standard",
+                "tmdisplay": "Standard game rules"
+            },
+            "2": {
+                "name": "Merge Variant",
+                "tmdisplay": "When players are passed two cards, they add them to their hand then play any card from their hand as a marketing card."
+            }
+        },
+        "default": "1"
+    }
+}
