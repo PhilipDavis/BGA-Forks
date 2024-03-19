@@ -1095,23 +1095,18 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
 
-        __eventNotifyPromise: null,
         setupNotifications() {
             console.log('notifications subscriptions setup');
-            const eventNames = [
-                'dealt',
-                'allDealt',
-                'cardsPassed',
-                'received',
-                'cardDiscarded',
-                'revealed',
-                'losers',
-            ];
+            const eventNames = Object.getOwnPropertyNames(this.__proto__).reduce((all, name) => {
+                const match = /^notify_(.+?)$/.exec(name);
+                match && all.push(match[1]);
+                return all;
+            }, []);
             for (const eventName of eventNames) {
                 dojo.subscribe(eventName, this, async data => {
                     const fnName = `notify_${eventName}`;
                     if (!this[fnName]) {
-                        throw new Error (`Missing notification function named ${fnName}`);
+                        throw new Error (`Missing function named ${fnName}`);
                     }
                     console.log(`Entering ${fnName}`, data.args);
                     await this[fnName].call(this, data.args);
@@ -1120,6 +1115,7 @@ function (dojo, declare) {
                 });
                 this.notifqueue.setSynchronous(eventName);
             }
+            console.log(`Registered ${eventNames.length} event handlers`);
         },
 
         async notify_dealt({ cards }) {

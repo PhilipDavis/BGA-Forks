@@ -167,7 +167,8 @@ class ForksPD extends Table
     protected function validateCaller()
     {
         // Get the function name of the caller -- https://stackoverflow.com/a/11238046
-        $actionName = debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        $fnName = debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'];
+        $actionName = explode('_', $fnName)[1];
         self::checkAction($actionName);
 
         // Current player is who made the AJAX call to us
@@ -183,7 +184,7 @@ class ForksPD extends Table
 //////////// Player actions
 //////////// 
 
-    function passCards($cardIds)
+    function action_passCards($cardIds)
     {
         $playerId = $this->validateCaller();
 
@@ -210,7 +211,7 @@ class ForksPD extends Table
         $this->giveExtraTime($playerId);
     }
 
-    function discardCard($cardId)
+    function action_discardCard($cardId)
     {
         $playerId = $this->validateCaller();
 

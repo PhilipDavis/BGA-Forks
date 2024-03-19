@@ -33,7 +33,7 @@ class action_forkspd extends APP_GameAction
         
         $cardId1 = intval(self::getArg('card1', AT_posint, true));
         $cardId2 = intval(self::getArg('card2', AT_posint, true));
-        $this->game->passCards([ $cardId1, $cardId2 ]);
+        $this->game->action_passCards([ $cardId1, $cardId2 ]);
 
         self::ajaxResponse();
     }
@@ -43,7 +43,7 @@ class action_forkspd extends APP_GameAction
         self::setAjaxMode();     
 
         $cardId = intval(self::getArg('card', AT_posint, true));
-        $this->game->discardCard($cardId);
+        $this->game->action_discardCard($cardId);
 
         self::ajaxResponse();
     }
