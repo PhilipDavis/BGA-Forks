@@ -676,6 +676,7 @@ function (dojo, declare) {
         // KILL/KEEP? But this animation works better than the one above... so using this for now
         async animatePassCardAsync(cardId) {
             const cardDiv = document.getElementById(`forks_card-${cardId}`);
+            if (!cardDiv) return;
             const slotDiv = cardDiv.parentElement;
             const slotIndex = Number(slotDiv.dataset.slot);
 
@@ -761,6 +762,7 @@ function (dojo, declare) {
 
         async animateDealtCardToHandAsync(cardId) {
             const cardDiv = document.getElementById(`forks_card-${cardId}`);
+            if (!cardDiv) return;
             const slotDiv = cardDiv.parentElement;
             const slotIndex = Number(slotDiv.dataset.slot);
 
@@ -805,6 +807,7 @@ function (dojo, declare) {
 
         async animateReceivedCardToHandAsync(cardId) {
             const cardDiv = document.getElementById(`forks_card-${cardId}`);
+            if (!cardDiv) return;
             const slotDiv = cardDiv.parentElement;
             const slotIndex = Number(slotDiv.dataset.slot);
 
@@ -832,6 +835,7 @@ function (dojo, declare) {
 
         async animateDiscardCardAsync(cardId) {
             const cardDiv = document.getElementById(`forks_card-${cardId}`);
+            if (!cardDiv) return;
             const isFirstSlot = Number(cardDiv.parentElement.dataset.slot) === 0;
 
             const destDiv = document.getElementById('forks_marketing-hidden');
@@ -858,6 +862,7 @@ function (dojo, declare) {
         // This is for the Merge Variant
         async animateDiscardCardFromHandAsync(cardId) {
             const cardDiv = document.getElementById(`forks_card-${cardId}`);
+            if (!cardDiv) return;
             const destDiv = document.getElementById('forks_marketing-hidden');
             
             await this.performCardAnimationAsync(cardDiv, destDiv, (deltaX, deltaY, flipPercent) => {
@@ -992,6 +997,19 @@ function (dojo, declare) {
             const { color, value } = Cards[cardId];
             const scoreDiv = document.getElementById(`forks_marketing-score-${color}`);
             scoreDiv.innerHTML = Number(scoreDiv.innerHTML) + value;
+        },
+
+        cleanUpForReplays() {
+            // Manually clean up any remaining cards that weren't animated to where
+            // they were supposed to go. This can happen if an animation is interrupted.
+            const queriesToPurge = [
+                '#forks_my-dealt .forks_card',
+                '#forks_my-received .forks_card',
+            ];
+            const divsToPurge = queriesToPurge.flatMap(q => [ ...document.querySelectorAll(q) ]);
+            for (const div of divsToPurge) {
+                div.parentElement.removeChild(div);
+            }
         },
 
 
@@ -1137,7 +1155,30 @@ function (dojo, declare) {
             this.setRoundInformation(round, total);
         },
 
+        async notify_youPassedCards({ cards }) {
+            // Update the internal game state
+            const player = this.forks.players[this.myPlayerId];
+            player.dealt = player.dealt.filter(id => cards.indexOf(id) === -1);
+            const keepCardId = player.dealt[0];
+            player.hand.push(keepCardId);
+            player.dealt = [];
+            player.passing = [];
+
+            await Promise.all(
+                cards.map(async (cardId, i) => {
+                    await this.delayAsync(i * 400);
+                    await this.animatePassCardAsync(cardId);
+                })
+            );
+
+            await this.delayAsync(100);
+            await this.animateDealtCardToHandAsync(keepCardId);
+        },
+
         async notify_cardsPassed({ playerId }) {
+            // Already handled the current player
+            if (playerId == this.myPlayerId) return;
+
             if (playerId == this.previousPlayerId) {
                 // Animate two cards from the player board into the receiving area
                 const incomingCards = [ 0, 1 ].map(i => {
@@ -1156,26 +1197,6 @@ function (dojo, declare) {
                     }, { deleteAfter: true, speedMultiplier: 2 });
                 });
                 await Promise.all(promises);
-            }
-            else if (playerId == this.myPlayerId) {
-                // Update the internal game state
-                const player = this.forks.players[this.myPlayerId];
-                const cardsToPass = player.passing;
-                player.dealt = player.dealt.filter(id => cardsToPass.indexOf(id) === -1);
-                const keepCardId = player.dealt[0];
-                player.hand.push(keepCardId);
-                player.dealt = [];
-                player.passing = [];
-
-                await Promise.all(
-                    cardsToPass.map(async (cardId, i) => {
-                        await this.delayAsync(i * 400);
-                        await this.animatePassCardAsync(cardId);
-                    })
-                );
-
-                await this.delayAsync(100);
-                await this.animateDealtCardToHandAsync(keepCardId);
             }
         },
 
@@ -1220,48 +1241,54 @@ function (dojo, declare) {
             }
         },
 
-        async notify_cardDiscarded({ playerId }) {
+        async notify_youDiscardedCard({ card: cardToDiscard }) {
             // Update the internal game state
             this.forks.marketingHidden++;
+            const player = this.forks.players[this.myPlayerId];
+            const keepCardId = player.received.filter(id => id !== cardToDiscard)[0]; // NOT for Merge Variant
+            player.hand.push(...player.received);
+            player.hand = player.hand.filter(id => id !== cardToDiscard);
+            player.received = [];
 
             // Animate card being discarded to hidden marketing pile, remove
             // info from the card, and animate card kept into the player hand
-            if (playerId == this.myPlayerId) {
-                const { cardToDiscard } = this.clientStartArgs;
 
-                // Update the internal game state
-                const player = this.forks.players[this.myPlayerId];
-                const keepCardId = player.received.filter(id => id !== cardToDiscard)[0]; // NOT for Merge Variant
-                player.hand.push(...player.received);
-                player.hand = player.hand.filter(id => id !== cardToDiscard);
-                player.received = [];
-                
-                // In merge variant, player can discard from any card in player's hand
-                if (this.forks.options.allowMerge) {
-                    await this.animateDiscardCardFromHandAsync(cardToDiscard);
-                }
-                else {
-                    await this.animateDiscardCardAsync(cardToDiscard);
-                    await this.delayAsync(200);
-                    await this.animateReceivedCardToHandAsync(keepCardId);
-                }
-
-                delete this.clientStartArgs.cardToDiscard;
+            // In merge variant, player can discard from any card in player's hand
+            if (this.forks.options.allowMerge) {
+                await this.animateDiscardCardFromHandAsync(cardToDiscard);
             }
             else {
-                // Animate a card from the player's board to the discard pile
-                const cardDiv = this.createCard(`discard-${playerId}`, false, `player_board_${playerId}`);
-                const destDiv = document.getElementById('forks_marketing-hidden');
-                await this.performCardAnimationAsync(cardDiv, destDiv, (deltaX, deltaY) => {
-                    return {
-                        '0': `transform: translate(0, 0) rotateY(-180deg) scaleZ(.667);`,
-                        '100': `transform: translate(${deltaX}px, ${deltaY}px) rotateY(-180deg) scaleZ(1);`,
-                    };
-                }, { deleteAfter: true, speedMultiplier: 2 });
+                await this.animateDiscardCardAsync(cardToDiscard);
+                await this.delayAsync(200);
+                await this.animateReceivedCardToHandAsync(keepCardId);
             }
+
+            delete this.clientStartArgs.cardToDiscard;
+        },
+
+        async notify_cardDiscarded({ playerId }) {
+            // We've already handled the current player
+            if (playerId == this.myPlayerId) {
+                return;
+            }
+
+            // Update the internal game state
+            this.forks.marketingHidden++;
+
+            // Animate a card from the player's board to the discard pile
+            const cardDiv = this.createCard(`discard-${playerId}`, false, `player_board_${playerId}`);
+            const destDiv = document.getElementById('forks_marketing-hidden');
+            await this.performCardAnimationAsync(cardDiv, destDiv, (deltaX, deltaY) => {
+                return {
+                    '0': `transform: translate(0, 0) rotateY(-180deg) scaleZ(.667);`,
+                    '100': `transform: translate(${deltaX}px, ${deltaY}px) rotateY(-180deg) scaleZ(1);`,
+                };
+            }, { deleteAfter: true, speedMultiplier: 2 });
         },
 
         async notify_revealed({ cards, round, total }) {
+            this.cleanUpForReplays();
+
             // Update the internal game state
             this.forks.marketing.push(...cards);
             this.forks.marketingHidden = 0;

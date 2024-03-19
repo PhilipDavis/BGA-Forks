@@ -201,6 +201,11 @@ class ForksPD extends Table
         if (!$this->getGameStateValue("gameStarted"))
             $this->setGameStateValue("gameStarted", 1);
 
+        $this->notifyPlayer($playerId, 'youPassedCards', '', [
+            'cards' => $cardIds,
+            'preserve' => [ 'cards' ],
+        ]);
+    
         $this->notifyAllPlayers('cardsPassed', clienttranslate('${playerName} passes cards'), [
             'playerName' => $this->getPlayerNameById($playerId),
             'playerId' => $playerId,
@@ -223,6 +228,11 @@ class ForksPD extends Table
             throw new BgaVisibleSystemException("Invalid operation - Ref #" . $refId); // NOI18N
         }
         $this->saveGameState($forks);
+
+        $this->notifyPlayer($playerId, 'youDiscardedCard', '', [
+            'card' => $cardId,
+            'preserve' => [ 'card' ],
+        ]);
 
         // Notify all players about the card played
         $this->notifyAllPlayers('cardDiscarded', clienttranslate('${playerName} discards a card'), [
@@ -286,7 +296,7 @@ class ForksPD extends Table
             ]);
         }
 
-        $this->notifyAllPlayers('passed', clienttranslate('Cards have been passed'), []);
+        $this->notifyAllPlayers('allPassed', clienttranslate('Cards have been passed'), []);
         $this->gamestate->nextState('');
     }
 
