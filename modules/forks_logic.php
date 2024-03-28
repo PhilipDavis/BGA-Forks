@@ -1,7 +1,7 @@
 <?php
 // © Copyright 2024, Philip Davis (mrphilipadavis AT gmail)
 
-class Forks
+class ForksLogic
 {
     private $data;
 
@@ -79,7 +79,7 @@ class Forks
     {
         // Stronger colour comes first. (e.g. Red comes before Green)
         // This is used for tie-breaking
-        return array_search($colorB, Forks::$Colors) - array_search($colorA, Forks::$Colors);
+        return array_search($colorB, ForksLogic::$Colors) - array_search($colorA, ForksLogic::$Colors);
     }
 
     private function __construct($data)
@@ -89,7 +89,7 @@ class Forks
 
     static function fromJson($json)
     {
-        return new Forks(json_decode($json));
+        return new ForksLogic(json_decode($json));
     }
     
     static function newGame($playerIds, $options)
@@ -134,7 +134,7 @@ class Forks
             array_push($marketing, array_pop($deck));
         }
         
-        return new Forks((object)[
+        return new ForksLogic((object)[
             'version' => 1, // Only need to increment for breaking changes after beta release
             'ed' => 2, // 2nd edition
             'options' => $options,
@@ -330,7 +330,7 @@ class Forks
         $laneScores = [];
         foreach ($this->data->marketing as $cardId)
         {
-            $cardData = Forks::$Cards[$cardId];
+            $cardData = ForksLogic::$Cards[$cardId];
             $color = $cardData['color'];
             $value = $cardData['value'];
             $laneScores[$color] = $value + (array_key_exists($color, $laneScores) ? $laneScores[$color] : 0);
@@ -342,7 +342,7 @@ class Forks
         uksort($laneScores, function($colorA, $colorB) use ($laneScores) {
             $delta = $laneScores[$colorB] - $laneScores[$colorA];
             if ($delta != 0) return $delta;
-            return Forks::CompareColors($colorA, $colorB);
+            return ForksLogic::CompareColors($colorA, $colorB);
         });
         $orderedColors = array_keys($laneScores);
         $colorModifier = array_merge(...array_map(fn($color) => [ $color => array_search($color, $orderedColors) <= 2 ? 1 : -1 ], $orderedColors));
@@ -357,7 +357,7 @@ class Forks
         {
             $playerScores[$playerId] = array_reduce($player->hand, function($playerScore, $cardId) use ($colorModifier, $playerCount)
             {
-                $cardData = Forks::$Cards[$cardId];
+                $cardData = ForksLogic::$Cards[$cardId];
                 $value = $cardData['value'];
                 $color = $cardData['color'];
                 $modifier = $colorModifier[$color];

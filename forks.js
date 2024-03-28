@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * ForksPD implementation : © Copyright 2024, Philip Davis (mrphilipadavis AT gmail)
+ * Forks implementation : © Copyright 2024, Philip Davis (mrphilipadavis AT gmail)
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -14,7 +14,7 @@ define([
     "ebg/counter",
 ],
 function (dojo, declare) {
-    const BgaGameId = `forkspd`;
+    const BgaGameId = `forks`;
     const BasePath = `${BgaGameId}/${BgaGameId}`;
 
     const Cards = [
@@ -1252,7 +1252,7 @@ function (dojo, declare) {
 
             // Animate card being discarded to hidden marketing pile, remove
             // info from the card, and animate card kept into the player hand
-
+                
             // In merge variant, player can discard from any card in player's hand
             if (this.forks.options.allowMerge) {
                 await this.animateDiscardCardFromHandAsync(cardToDiscard);

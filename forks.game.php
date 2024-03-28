@@ -2,7 +2,7 @@
  /**
   *------
   * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
-  * ForksPD implementation : © Copyright 2024, Philip Davis (mrphilipadavis AT gmail)
+  * Forks implementation : © Copyright 2024, Philip Davis (mrphilipadavis AT gmail)
   * 
   * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
   * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -15,7 +15,7 @@ require_once('modules/forks_logic.php');
 define('FORKS_RULESET_STANDARD', 1);
 define('FORKS_RULESET_MERGE_VARIANT', 2);
 
-class ForksPD extends Table
+class Forks extends Table
 {
 	function __construct()
 	{
@@ -40,7 +40,7 @@ class ForksPD extends Table
     protected function getGameName()
     {
 		// Used for translations and stuff. Please do not modify.
-        return "forkspd";
+        return "forks";
     }	
 
     //
@@ -100,7 +100,7 @@ class ForksPD extends Table
             'allowMerge' => $this->getGameStateValue('mergeVariant') == FORKS_RULESET_MERGE_VARIANT,
         ];
         
-        $forks = Forks::newGame($playerIds, $forksOptions);
+        $forks = ForksLogic::newGame($playerIds, $forksOptions);
         $this->initializeGameState($forks);
     }
 
@@ -145,7 +145,7 @@ class ForksPD extends Table
     protected function loadGameState()
     {
         $json = $this->getObjectFromDB("SELECT id, doc FROM game_state LIMIT 1")['doc'];
-        return Forks::fromJson($json);
+        return ForksLogic::fromJson($json);
     }
 
     protected function saveGameState($forks)
