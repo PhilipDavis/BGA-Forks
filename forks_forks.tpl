@@ -33,6 +33,16 @@
 <script type="text/javascript">
 
 const forks_Templates = {
+    playerSummaryCounters:
+        '<div id="forks_player-${PID}-scores" class="forks_player-scores">' +
+        '</div>',
+
+    playerSummaryCounter:
+        '<div class="forks_score-${COLOR}">' +
+            '<div class="forks_icon forks_icon-${COLOR}"></div>' +
+            '<div class="forks_player-score" id="forks_player-${PID}-score-${COLOR}"></div>' +
+        '</div>',
+
     marketingLane:
         '<div id="forks_marketing-${COLOR}" class="forks_marketing-lane">' +
             '<div id="forks_marketing-score-${COLOR}" class="forks_marketing-score">0</div>' +

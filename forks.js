@@ -17,6 +17,14 @@ function (dojo, declare) {
     const BgaGameId = `forks`;
     const BasePath = `${BgaGameId}/${BgaGameId}`;
 
+    const Suits = [
+        'grey',
+        'blue',
+        'yellow',
+        'green',
+        'red',
+    ];
+
     const Cards = [
         {}, // blank entry to adjust for 1-based indexes of cards
         { color: 'grey', value: 3 },
@@ -160,6 +168,9 @@ function (dojo, declare) {
             tieBreakDiv.addEventListener('click', () => this.onClickTieBreaker());
             tieBreakDiv.addEventListener('mouseout', () => tieBreakDiv.classList.remove('forks_touching'));
 
+            this.playerSummaries = {};
+            this.createPlayerSummaryScore(this.myPlayerId);
+
             if (gamedata.intro) {
                 const player = forks.players[this.myPlayerId];
                 // Note: for 6-players, there are no cards dealt here.
@@ -209,6 +220,16 @@ function (dojo, declare) {
                         }
                         if (player.passing.length) {
                             document.getElementById('forks_my-passed').classList.remove('forks_empty');
+                        }
+
+                        // Set the score in the player summary
+                        const scoreBySuit = { grey: 0, blue: 0, yellow: 0, green: 0, red: 0 };
+                        for (const cardId of cardsInHand) {
+                            const { color, value } = Cards[cardId];
+                            scoreBySuit[color] += value;
+                        }
+                        for (const [ suit, value ] of Object.entries(scoreBySuit)) {
+                            this.playerSummaries[playerId][suit].setValue(value);
                         }
                     }
 
@@ -343,6 +364,25 @@ function (dojo, declare) {
                         : _('{n} more rounds');
             const message = template.replace(/\{n\}/ig, roundsLeft);
             document.getElementById('forks_round-info').innerText = message;
+        },
+
+        createPlayerSummaryScore(playerId) {
+            dojo.place(this.format_block('forks_Templates.playerSummaryCounters', {
+                PID: playerId,
+            }), `player_board_${playerId}`);
+
+            for (const suit of Suits) {
+                dojo.place(this.format_block('forks_Templates.playerSummaryCounter', {
+                    PID: playerId,
+                    COLOR: suit,
+                }), `forks_player-${playerId}-scores`);
+            }
+
+            this.playerSummaries[playerId] = {};
+            for (const suit of Suits) {
+                this.playerSummaries[playerId][suit] = new ebg.counter();
+                this.playerSummaries[playerId][suit].create(`forks_player-${playerId}-score-${suit}`);
+            }
         },
 
         createMarketingLane(color) {
@@ -778,6 +818,10 @@ function (dojo, declare) {
                         `z-index: ${cardId};`,
                 };
             }, { replaceAfter: true });
+            
+            // Add to the score on the player summary board
+            const { color, value } = Cards[cardId];
+            this.playerSummaries[this.myPlayerId][color].incValue(value);
 
             cardDiv.style.zIndex = cardId;
         },
@@ -826,6 +870,10 @@ function (dojo, declare) {
                 };
             }, { replaceAfter: true });
 
+            // Add to the score on the player summary board
+            const { color, value } = Cards[cardId];
+            this.playerSummaries[this.myPlayerId][color].incValue(value);
+
             cardDiv.style.zIndex = cardId;
 
             if (!this.forks.options.allowMerge) {
@@ -864,7 +912,11 @@ function (dojo, declare) {
             const cardDiv = document.getElementById(`forks_card-${cardId}`);
             if (!cardDiv) return;
             const destDiv = document.getElementById('forks_marketing-hidden');
-            
+                        
+            // Subtract the score on the player summary board
+            const { color, value } = Cards[cardId];
+            this.playerSummaries[this.myPlayerId][color].incValue(-value);
+
             await this.performCardAnimationAsync(cardDiv, destDiv, (deltaX, deltaY, flipPercent) => {
                 // Choose the angle based on the vector to the discard pile
                 const intermediateRotation = deltaY ? -Math.atan(deltaX / deltaY) / Math.PI * 180 : 0;
@@ -1337,6 +1389,10 @@ function (dojo, declare) {
             const surfaceDiv = document.getElementById('forks_surface');
             for (const color of losers) {
                 surfaceDiv.classList.add(`forks_loser-${color}`);
+
+                // Negate the loser scores in the player summary board
+                const counter = this.playerSummaries[this.myPlayerId][color];
+                counter.setValue(-counter.getValue());
             }
 
             await this.delayAsync(1000);

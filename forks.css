@@ -494,6 +494,37 @@
 }
 
 
+/* Player Summary */
+
+.forks_player-scores {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    gap: .75em;
+    margin-top: .5em;
+}
+
+.forks_player-scores > div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: .5em;
+}
+
+.forks_icon {
+    background-image: url(img/forks-card-body-med.png);
+    width: 2em;
+    height: 3em;
+    background-size: 12em 3.2em;
+    background-repeat: no-repeat;
+}
+.forks_icon-grey   { background-position: -0.2em 0; }
+.forks_icon-blue   { background-position: -2.6em 0; }
+.forks_icon-yellow { background-position: -5.0em 0; }
+.forks_icon-green  { background-position: -7.4em 0; }
+.forks_icon-red    { background-position: -9.8em 0; }
+
+
 
 
 
