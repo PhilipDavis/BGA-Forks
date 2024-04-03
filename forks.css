@@ -526,6 +526,50 @@
 
 
 
+/* Final Scores */
+
+#forks_final-scores {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: .25em;
+    background: rgba(255, 255, 255, .8);
+    z-index: 1000;
+    font-size: 1.5em;
+}
+
+#forks_final-scores-table {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: .5em 1em;
+    border: solid .2em rgba(0, 0, 0, .8);
+    padding: 0.5em 1em;
+}
+.forks_2-players #forks_final-scores-table { grid-template-columns: auto repeat(2, 1fr); }
+.forks_3-players #forks_final-scores-table { grid-template-columns: auto repeat(3, 1fr); }
+.forks_4-players #forks_final-scores-table { grid-template-columns: auto repeat(4, 1fr); }
+.forks_5-players #forks_final-scores-table { grid-template-columns: auto repeat(5, 1fr); }
+.forks_6-players #forks_final-scores-table { grid-template-columns: auto repeat(6, 1fr); }
+
+.forks_final-score-header {
+    font-weight: 400;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: right;
+    min-width: 3em;
+}
+.forks_final-score-value {
+    opacity: 0;
+    transition: opacity .4s ease-out;
+    text-align: right;
+    margin-right: 1em;
+    min-width: 3em;
+}
+.forks_final-score-total {
+    font-weight: 700;
+}
 
 
 /* CSS for phones */
@@ -578,4 +622,8 @@
     #forks_my-dealt {
         top: 22em;
     }
+
+    .forks_player-scores > div {
+        flex-direction: row;
+    }    
 }

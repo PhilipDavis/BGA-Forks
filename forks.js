@@ -137,6 +137,9 @@ function (dojo, declare) {
             }
 
             const playerCount = forks.order.length;
+
+            document.getElementById('forks_surface').classList.add(`forks_${playerCount}-players`);
+
             this.nextPlayerId = forks.order[(forks.order.indexOf(this.player_id) + 1) % playerCount];
             this.myPlayerId = this.player_id;
             this.previousPlayerId = forks.order[(forks.order.indexOf(this.player_id) + playerCount - 1) % playerCount];
@@ -148,11 +151,24 @@ function (dojo, declare) {
                 this.scoreCounter[playerId].setValue(0);
             }
 
-            this.createMarketingLane('grey');
-            this.createMarketingLane('blue');
-            this.createMarketingLane('yellow');
-            this.createMarketingLane('green');
-            this.createMarketingLane('red');
+            this.SuitNames = {
+                'grey': _('Grey'),
+                'blue': _('Blue'),
+                'yellow': _('Yellow'),
+                'green': _('Green'),
+                'red': _('Red'),
+            };
+            this.SuitColors = {
+                'grey': '55646a',
+                'blue': '254567',
+                'yellow': '7e6123',
+                'green': '1e3c39',
+                'red': '701e2e',
+            };
+
+            for (const suit of Suits) {
+                this.createMarketingLane(suit);
+            }
 
             if (!forks.deck) {
                 document.getElementById('forks_deck').classList.add('forks_empty');
@@ -1022,6 +1038,71 @@ function (dojo, declare) {
             });
         },
 
+        async animateFinalScores(scores) {
+            // Add the empty table and the top-left empty header cell
+            dojo.place(this.format_block('forks_Templates.finalScores'), 'forks_surface');
+            dojo.place(this.format_block('forks_Templates.finalScoreHeader', {
+                TEXT: '',
+                COLOR: '#000',
+            }), 'forks_final-scores-table');
+
+            // Add the player names along the top
+            for (const playerId of Object.keys(scores)) {
+                const { name, color } = this.gamedatas.players[playerId];
+                dojo.place(this.format_block('forks_Templates.finalScoreHeader', {
+                    TEXT: name,
+                    COLOR: color,
+                }), 'forks_final-scores-table');
+            }
+
+            // Add a scoring row for each suit
+            for (const suit of Suits) {
+                dojo.place(this.format_block('forks_Templates.finalScoreHeader', {
+                    TEXT: this.SuitNames[suit],
+                    COLOR: this.SuitColors[suit],
+                }), 'forks_final-scores-table');
+
+                for (const [ playerId, playerScore ] of Object.entries(scores)) {
+                    const divId = `forks_final-score-${playerId}-${suit}`;
+                    dojo.place(this.format_block('forks_Templates.finalScoreValue', {
+                        DIV_ID: divId,
+                        TEXT: playerScore[suit],
+                        COLOR: this.SuitColors[suit],
+                    }), 'forks_final-scores-table');
+                }
+            }
+
+            // Add a total score row
+            dojo.place(this.format_block('forks_Templates.finalScoreHeader', {
+                TEXT: _('Total'),
+                COLOR: '#000',
+            }), 'forks_final-scores-table');
+            for (const [ playerId, playerScore ] of Object.entries(scores)) {
+                const divId = `forks_final-score-${playerId}`;
+                dojo.place(this.format_block('forks_Templates.finalScoreValue', {
+                    DIV_ID: divId,
+                    TEXT: playerScore.total,
+                    COLOR: '#000',
+                }), 'forks_final-scores-table');
+                document.getElementById(divId).classList.add('forks_final-score-total');
+            }
+
+            // Animate the reveal of the scores
+            for (const suit of Suits) {
+                for (const playerId of Object.keys(scores)) {
+                    const divId = `forks_final-score-${playerId}-${suit}`;
+                    document.getElementById(divId).style.opacity = 1;
+                    await this.delayAsync(200);
+                }
+                await this.delayAsync(800);
+            }
+            for (const playerId of Object.keys(scores)) {
+                const divId = `forks_final-score-${playerId}`;
+                document.getElementById(divId).style.opacity = 1;
+                await this.delayAsync(200);
+            }
+        },
+
         // Similar to placeOnObject, except it sets the child of
         // the parent instead of just setting the coordinates.
         placeInElement(childIdOrElement, parentIdOrElement) {
@@ -1381,9 +1462,9 @@ function (dojo, declare) {
                 this.setMarketingScore(color, score);
             }
             
-            // Update the player boards
-            for (const [ playerId, score ] of Object.entries(scores)) {
-                this.scoreCounter[playerId].incValue(score);
+            // Update the player boards (official score)
+            for (const [ playerId, playerScore ] of Object.entries(scores)) {
+                this.scoreCounter[playerId].incValue(playerScore.total);
             }
             // Animate the losing stacks downward
             const surfaceDiv = document.getElementById('forks_surface');
@@ -1396,6 +1477,11 @@ function (dojo, declare) {
             }
 
             await this.delayAsync(1000);
+
+            // Display a summary table of all scores
+            await this.animateFinalScores(scores);
+
+            await this.delayAsync(2000);
         },
     });
 });

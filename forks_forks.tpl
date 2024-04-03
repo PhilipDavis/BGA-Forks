@@ -65,8 +65,31 @@ const forks_Templates = {
             '</div>' +
             '<div class="forks_card-back"></div>' +
         '</div>',
+
+    finalScores:
+        '<div id="forks_final-scores">' +
+            '<div id="forks_final-scores-table">' +
+            '</div>' +
+        '</div>',
+
+    finalScoreHeader:
+        '<div '+
+            'class="forks_final-score-header" ' +
+            'style="color: #${COLOR};" ' +
+        '>' +
+            '${TEXT}' +
+        '</div>',
+
+    finalScoreValue:
+        '<div '+
+            'id="${DIV_ID}" ' +
+            'class="forks_final-score-value" ' +
+            'style="color: #${COLOR};" ' +
+        '>' +
+            '${TEXT}' +
+        '</div>',
 };
 
-</script>  
+</script>
 
 {OVERALL_GAME_FOOTER}

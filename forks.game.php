@@ -349,7 +349,7 @@ class Forks extends Table
 
             $this->notifyAllPlayers('losers', '', [
                 'losers' => $losers,
-                'scores' => array_map(fn($ps) => $ps['total'], $playerScores),
+                'scores' => $playerScores,
                 'preserve' => [ 'losers', 'scores' ],
             ]);
                         
