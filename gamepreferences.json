@@ -4,12 +4,12 @@
         "needReload": false,
         "values": {
             "1": {
-                "name": "Off",
-                "cssPref": "forks_pref-columnSums-off"
-            },
-            "2": {
                 "name": "On",
                 "cssPref": "forks_pref-columnSums-on"
+            },
+            "2": {
+                "name": "Off",
+                "cssPref": "forks_pref-columnSums-off"
             }
         },
         "default": 1
